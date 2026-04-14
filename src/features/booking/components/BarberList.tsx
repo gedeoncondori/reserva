@@ -3,11 +3,14 @@ import { supabase } from '../../../lib/supabase';
 import { BarberCard } from './BarberCard';
 import { useBookingStore } from '../../../store/useBookingStore';
 import { ArrowLeft } from 'lucide-react';
+import { Database } from '../../../types/supabase';
+
+type Barbero = Database['public']['Tables']['perfiles']['Row'];
 
 export const BarberList = () => {
     const { setBarbero, barbero: selected, prevStep } = useBookingStore();
 
-    const { data: barberos, isLoading } = useQuery({
+    const { data: barberos, isLoading } = useQuery<Barbero[]>({
         queryKey: ['barberos'],
         queryFn: async () => {
             const { data, error } = await supabase
@@ -16,7 +19,7 @@ export const BarberList = () => {
                 .eq('rol', 'barbero')
                 .eq('estado', true);
             if (error) throw error;
-            return data;
+            return data || [];
         },
     });
 

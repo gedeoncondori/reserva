@@ -29,14 +29,37 @@ export interface Database {
                 Row: {
                     id: string
                     nombre: string
+                    descripcion: string | null
                     duracion_minutos: number
                     precio: number
                     monto_adelanto_fijo: number
                     estado: boolean
+                    activo: boolean
                     created_at: string
                 }
                 Insert: Omit<Database['public']['Tables']['servicios']['Row'], 'id' | 'created_at'>
                 Update: Partial<Database['public']['Tables']['servicios']['Insert']>
+            }
+            configuracion_local: {
+                Row: {
+                    id: number
+                    zona_horaria: string
+                    hora_apertura: string
+                    hora_cierre: string
+                    created_at: string
+                }
+                Insert: Omit<Database['public']['Tables']['configuracion_local']['Row'], 'id' | 'created_at'>
+                Update: Partial<Database['public']['Tables']['configuracion_local']['Insert']>
+            }
+            dias_especiales: {
+                Row: {
+                    id: string
+                    fecha: string
+                    tipo: 'feriado' | 'alta_demanda'
+                    created_at: string
+                }
+                Insert: Omit<Database['public']['Tables']['dias_especiales']['Row'], 'id' | 'created_at'>
+                Update: Partial<Database['public']['Tables']['dias_especiales']['Insert']>
             }
             horarios_barbero: {
                 Row: {

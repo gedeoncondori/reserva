@@ -6,12 +6,18 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+import { Database } from '../../../types/supabase';
+
+type ConfigLocal = Database['public']['Tables']['configuracion_local']['Row'];
+type DiaEspecial = Database['public']['Tables']['dias_especiales']['Row'];
+type DiaEspecialInsert = Database['public']['Tables']['dias_especiales']['Insert'];
+
 export const GlobalConfigModal = ({ onClose }: { onClose: () => void }) => {
     const queryClient = useQueryClient();
-    const [newSpecialDate, setNewSpecialDate] = useState({ fecha: '', tipo: 'feriado' });
+    const [newSpecialDate, setNewSpecialDate] = useState<DiaEspecialInsert>({ fecha: '', tipo: 'feriado' });
 
     // 1. Fetch Config General
-    const { data: config } = useQuery({
+    const { data: config } = useQuery<ConfigLocal>({
         queryKey: ['config-local'],
         queryFn: async () => {
             const { data, error } = await supabase.from('configuracion_local').select('*').eq('id', 1).single();
@@ -21,18 +27,18 @@ export const GlobalConfigModal = ({ onClose }: { onClose: () => void }) => {
     });
 
     // 2. Fetch Días Especiales
-    const { data: diasEspeciales } = useQuery({
+    const { data: diasEspeciales } = useQuery<DiaEspecial[]>({
         queryKey: ['dias-especiales'],
         queryFn: async () => {
             const { data, error } = await supabase.from('dias_especiales').select('*').order('fecha', { ascending: true });
             if (error) throw error;
-            return data;
+            return data || [];
         }
     });
 
     const updateConfig = useMutation({
         mutationFn: async (payload: any) => {
-            const { error } = await supabase.from('configuracion_local').update(payload).eq('id', 1);
+            const { error } = await (supabase.from('configuracion_local') as any).update(payload).eq('id', 1);
             if (error) throw error;
         },
         onSuccess: () => {
@@ -43,7 +49,7 @@ export const GlobalConfigModal = ({ onClose }: { onClose: () => void }) => {
 
     const addSpecialDay = useMutation({
         mutationFn: async () => {
-            const { error } = await supabase.from('dias_especiales').insert([newSpecialDate]);
+            const { error } = await (supabase.from('dias_especiales') as any).insert([newSpecialDate]);
             if (error) throw error;
         },
         onSuccess: () => {
@@ -114,7 +120,11 @@ export const GlobalConfigModal = ({ onClose }: { onClose: () => void }) => {
                         </div>
                         <div className="flex-1 min-w-[150px]">
                             <label className="text-[8px] font-black text-slate-500 uppercase block mb-1">Tipo de Día</label>
-                            <select value={newSpecialDate.tipo} onChange={e => setNewSpecialDate({ ...newSpecialDate, tipo: e.target.value })} className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-white text-sm">
+                            <select
+                                value={newSpecialDate.tipo}
+                                onChange={e => setNewSpecialDate({ ...newSpecialDate, tipo: e.target.value as any })}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-white text-sm"
+                            >
                                 <option value="feriado">Feriado (Cerrado)</option>
                                 <option value="alta_demanda">Alta Demanda (Abierto)</option>
                             </select>
