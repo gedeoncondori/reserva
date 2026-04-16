@@ -134,12 +134,20 @@ export const DashboardLayout = () => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => navigate('/dashboard/configuracion')}
-                        className={`w-10 h-10 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center overflow-hidden transition-all active:scale-90 ${location.pathname === '/dashboard/configuracion' ? 'ring-2 ring-blue-500' : ''}`}
-                    >
-                        {userProfile?.foto_url ? <img src={userProfile.foto_url} className="w-full h-full object-cover" /> : <User size={20} className="text-slate-600" />}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleLogout}
+                            className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center transition-colors hover:bg-red-500/20 active:scale-95"
+                        >
+                            <LogOut size={18} />
+                        </button>
+                        <button
+                            onClick={() => navigate('/dashboard/configuracion')}
+                            className={`w-10 h-10 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center overflow-hidden transition-all active:scale-90 ${location.pathname === '/dashboard/configuracion' ? 'ring-2 ring-blue-500' : ''}`}
+                        >
+                            {userProfile?.foto_url ? <img src={userProfile.foto_url} className="w-full h-full object-cover" /> : <User size={20} className="text-slate-600" />}
+                        </button>
+                    </div>
                 </header>
 
                 {/* SCROLLABLE SECTION */}
@@ -150,7 +158,7 @@ export const DashboardLayout = () => {
                 </main>
 
                 {/* --- BOTTOM NAVIGATION (MOBILE) --- */}
-                <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] bg-[#0b0f1a]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-3 flex items-center justify-around shadow-2xl shadow-black/80 z-[60] animate-in slide-in-from-bottom-10 duration-700">
+                <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0b0f1a]/95 backdrop-blur-3xl border-t border-white/10 px-2 py-4 flex items-center justify-around z-[60] shadow-[0_-10px_40px_rgba(0,0,0,0.8)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
                     {activeItems.map((item) => {
                         const isActive = item.path === '/dashboard'
                             ? location.pathname === '/dashboard'
@@ -162,22 +170,18 @@ export const DashboardLayout = () => {
                                 to={item.path}
                                 end={item.path === '/dashboard'}
                                 className={() => `
-                                    relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300
+                                    relative flex flex-col items-center justify-center w-16 gap-1 transition-all duration-300
                                     ${isActive
                                         ? 'text-white'
                                         : 'text-slate-500/80 hover:text-white'}
                                 `}
                             >
-                                <div className={`
-                                    absolute inset-0 rounded-2xl transition-all duration-500 transform
-                                    ${isActive ? 'bg-blue-600 scale-100 shadow-lg shadow-blue-600/30 shadow-blue-600/20' : 'bg-transparent scale-50 opacity-0'}
-                                `} />
-                                <span className="relative z-10 transition-transform duration-300 group-active:scale-90">
+                                <span className={`transition-all duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(37,99,235,0.6)] text-blue-500' : ''}`}>
                                     {item.icon}
                                 </span>
-                                {isActive && (
-                                    <div className="absolute -bottom-1.5 w-1 h-1 bg-white rounded-full" />
-                                )}
+                                <span className={`text-[10px] font-black uppercase tracking-wider transition-colors duration-300 ${isActive ? 'text-blue-500' : ''}`}>
+                                    {item.label}
+                                </span>
                             </NavLink>
                         );
                     })}

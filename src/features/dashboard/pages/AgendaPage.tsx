@@ -194,60 +194,60 @@ export const AgendaPage = () => {
         <div className="w-full space-y-10 animate-in fade-in duration-700 pb-20">
             {/* 1. Header & Selector */}
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 border-b border-white/5 pb-10">
-                <div className="space-y-2">
-                    <h1 className="text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
+                <div className="space-y-1">
+                    <h1 className="text-3xl md:text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
                         {currentUser?.rol === 'admin' ? 'Master Agenda' : 'Mi Agenda'}
                     </h1>
                     <div className="flex items-center gap-3">
-                        <span className="text-blue-500 font-bold text-[10px] uppercase tracking-[0.4em]">{currentUser?.nombre_completo}</span>
+                        <span className="text-blue-500 font-bold text-[9px] md:text-[10px] uppercase tracking-[0.4em]">{currentUser?.nombre_completo}</span>
                         <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
                     </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3">
                     {currentUser?.rol === 'admin' && (
-                        <button onClick={() => setIsConfigOpen(true)} className="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 hover:text-white transition-all shadow-xl hover:shadow-blue-600/10"><Settings2 size={24} /></button>
+                        <button onClick={() => setIsConfigOpen(true)} className="p-3 md:p-4 bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 hover:text-white transition-all shadow-xl hover:shadow-blue-600/10"><Settings2 size={20} /></button>
                     )}
-                    <div className="flex items-center bg-[#0b0f1a] p-2 rounded-[1.5rem] border border-slate-800 shadow-2xl relative overflow-hidden group">
-                        <button onClick={() => setSelectedDate(subDays(selectedDate, 1))} className="p-3 hover:bg-slate-800 rounded-xl text-slate-500 transition-colors"><ChevronLeft size={20} /></button>
-                        <div onClick={() => dateInputRef.current?.showPicker()} className="flex items-center gap-4 px-8 cursor-pointer select-none">
-                            <CalendarIcon size={18} className="text-blue-500" />
-                            <span className="font-black text-white text-xs uppercase tracking-[0.2em]">{format(selectedDate, "d MMMM, yyyy", { locale: es })}</span>
+                    <div className="flex items-center bg-[#0b0f1a] p-1.5 md:p-2 rounded-2xl md:rounded-[1.5rem] border border-slate-800 shadow-2xl relative overflow-hidden group flex-1 md:flex-initial justify-between">
+                        <button onClick={() => setSelectedDate(subDays(selectedDate, 1))} className="p-2 md:p-3 hover:bg-slate-800 rounded-xl text-slate-500 transition-colors"><ChevronLeft size={18} /></button>
+                        <div onClick={() => dateInputRef.current?.showPicker()} className="flex items-center gap-2 md:gap-4 px-2 md:px-8 cursor-pointer select-none">
+                            <CalendarIcon size={16} className="text-blue-500" />
+                            <span className="font-black text-white text-[10px] md:text-xs uppercase tracking-[0.1em] md:tracking-[0.2em]">{format(selectedDate, "d MMM, yyyy", { locale: es })}</span>
                             <input ref={dateInputRef} type="date" className="absolute opacity-0 w-0 h-0" value={format(selectedDate, 'yyyy-MM-dd')} onChange={(e) => e.target.value && setSelectedDate(new Date(e.target.value + 'T12:00:00'))} />
                         </div>
-                        <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-3 hover:bg-slate-800 rounded-xl text-slate-500 transition-colors"><ChevronRight size={20} /></button>
+                        <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-2 md:p-3 hover:bg-slate-800 rounded-xl text-slate-500 transition-colors"><ChevronRight size={18} /></button>
                     </div>
                 </div>
             </div>
 
-            {/* 2. Dashboard de Resumen (Cards rápidas) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-[#0b0f1a]/60 border border-white/5 p-6 rounded-[2rem] flex items-center gap-5 group hover:border-blue-500/30 transition-all">
-                    <div className="p-4 bg-blue-600/10 rounded-2xl text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-lg"><Clock size={24} /></div>
+            {/* 2. Dashboard de Resumen (Cards rápidas) compactadas para móvil */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+                <div className="bg-[#0b0f1a]/60 border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex flex-col md:flex-row md:items-center gap-2 md:gap-5 group hover:border-blue-500/30 transition-all">
+                    <div className="p-2 md:p-4 bg-blue-600/10 rounded-xl md:rounded-2xl text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-lg w-fit"><Clock size={18} className="md:w-6 md:h-6" /></div>
                     <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Total Citas</p>
-                        <p className="text-3xl font-black text-white tracking-tighter italic leading-none">{totalCitas}</p>
+                        <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Total Citas</p>
+                        <p className="text-xl md:text-3xl font-black text-white tracking-tighter italic leading-none">{totalCitas}</p>
                     </div>
                 </div>
-                <div className="bg-[#0b0f1a]/60 border border-white/5 p-6 rounded-[2rem] flex items-center gap-5 group hover:border-amber-500/30 transition-all">
-                    <div className="p-4 bg-amber-600/10 rounded-2xl text-amber-500 group-hover:bg-amber-600 group-hover:text-white transition-all shadow-lg"><Activity size={24} /></div>
+                <div className="bg-[#0b0f1a]/60 border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex flex-col md:flex-row md:items-center gap-2 md:gap-5 group hover:border-amber-500/30 transition-all">
+                    <div className="p-2 md:p-4 bg-amber-600/10 rounded-xl md:rounded-2xl text-amber-500 group-hover:bg-amber-600 group-hover:text-white transition-all shadow-lg w-fit"><Activity size={18} className="md:w-6 md:h-6" /></div>
                     <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Pendientes</p>
-                        <p className="text-3xl font-black text-white tracking-tighter italic leading-none">{numPendientes}</p>
+                        <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Pendientes</p>
+                        <p className="text-xl md:text-3xl font-black text-white tracking-tighter italic leading-none">{numPendientes}</p>
                     </div>
                 </div>
-                <div className="bg-[#0b0f1a]/60 border border-white/5 p-6 rounded-[2rem] flex items-center gap-5 group hover:border-green-500/30 transition-all">
-                    <div className="p-4 bg-green-600/10 rounded-2xl text-green-500 group-hover:bg-green-600 group-hover:text-white transition-all shadow-lg"><Wallet size={24} /></div>
+                <div className="bg-[#0b0f1a]/60 border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex flex-col md:flex-row md:items-center gap-2 md:gap-5 group hover:border-green-500/30 transition-all">
+                    <div className="p-2 md:p-4 bg-green-600/10 rounded-xl md:rounded-2xl text-green-500 group-hover:bg-green-600 group-hover:text-white transition-all shadow-lg w-fit"><Wallet size={18} className="md:w-6 md:h-6" /></div>
                     <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Recaudado</p>
-                        <p className="text-3xl font-black text-white tracking-tighter italic leading-none">${ingresosEstimados}</p>
+                        <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Recaudado</p>
+                        <p className="text-xl md:text-3xl font-black text-white tracking-tighter italic leading-none">${ingresosEstimados}</p>
                     </div>
                 </div>
-                <div className="bg-[#0b0f1a]/60 border border-white/5 p-6 rounded-[2rem] flex items-center gap-5 group hover:border-blue-500/30 transition-all">
-                    <div className="p-4 bg-blue-600/10 rounded-2xl text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-lg"><Users size={24} /></div>
+                <div className="bg-[#0b0f1a]/60 border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] flex flex-col md:flex-row md:items-center gap-2 md:gap-5 group hover:border-blue-500/30 transition-all">
+                    <div className="p-2 md:p-4 bg-blue-600/10 rounded-xl md:rounded-2xl text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-lg w-fit"><Users size={18} className="md:w-6 md:h-6" /></div>
                     <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Personal Hoy</p>
-                        <p className="text-3xl font-black text-white tracking-tighter italic leading-none">{barberos?.length || 0}</p>
+                        <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Personal Hoy</p>
+                        <p className="text-xl md:text-3xl font-black text-white tracking-tighter italic leading-none">{barberos?.length || 0}</p>
                     </div>
                 </div>
             </div>
