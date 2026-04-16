@@ -109,31 +109,38 @@ export const useAvailability = ({ barberoId, fecha, duracionServicio }: UseAvail
                 let t = timeToMinutes(horario.hora_inicio);
                 const dayEnd = timeToMinutes(horario.hora_fin);
 
-                // Algoritmo de "Empaquetado Fluido" (Greedy Gap Packing)
-                while (t + totalDurationWithMargin <= dayEnd) {
+                // OPTIMIZACIÓN: Algoritmo de "Empaquetado Fluido" (Greedy Gap Packing)
+                // ¿CÓMO ESTAMOS LOGRANDO OPTIMIZAR EL HORARIO SIN DEJAR HUECOS INNECESARIOS?
+                // En lugar de ofrecer horas estáticas (ej. 10:00, 11:00, 12:00) saltando en bloques fijos,
+                // buscamos el primer minuto libre ("t") en el que cabe perfectamente la duración total del servicio.
+                // EXCEPCIÓN DE CIERRE: Solo exigimos que el SERVICIO (duracionServicio) termine antes o a la misma 
+                // hora del cierre del bloque (dayEnd). El margen de descanso puede sobrepasar el horario sin problema.
+                while (t + duracionServicio! <= dayEnd) {
                     const slotStart = t;
                     const slotEnd = t + totalDurationWithMargin;
 
-                    // Verificamos todos los obstaculos en este posible turno
+                    // Verificamos si este bloque de tiempo (slotStart a slotEnd) choca con alguna cita existente (colliders).
                     const colliders = existingSlots.filter((cita: any) =>
                         Math.max(slotStart, cita.start) < Math.min(slotEnd, cita.end)
                     );
 
                     if (colliders.length > 0) {
-                        // Si choca, NO avanzamos un bloque irreal. Avanzamos exactamente
-                        // a la hora en que termina la última cita que esté estorbando en este trayecto.
+                        // AQUÍ RADICA LA MAGIA: Si hay una colisión, NO avanzamos "30 minutos" o un bloque ciego.
+                        // Calculamos exactamente a qué hora termina la cita que nos estorba (maxEnd),
+                        // y hacemos que nuestro buscador ("t") salte de inmediato a ese minuto exacto.
+                        // De esta forma, rellenamos el espacio disponible justo después de la próxima cita,
+                        // empaquetando o juntando ("packing") los turnos para eliminar los huecos (gaps).
                         const maxEnd = Math.max(...colliders.map(c => c.end));
                         t = maxEnd;
                     } else {
-                        // Si encontramos un buen hueco libre, validamos por último que
-                        // cumpla con las horas de anticipación requeridas.
+                        // Si encontramos un bloque 100% libre, validamos por último que
+                        // cumpla con el tiempo mínimo de anticipación requerido por el barbero hoy.
                         if (!isToday || slotStart >= currentMinutes + minAnticipacion) {
                             availableSlots.push(minutesToTime(slotStart));
                         }
-                        // Saltamos un bloque entero para ofrecer un turno empaquetado continuo.
-                        // (Ej: Si reservan a las 9:20, la siguiente opción fluida será 10:20)
-                        // Para permitir máxima densidad, este paso podría reducirse (ej: t+=30), 
-                        // pero avanzar por totalDuration asegura que ofrezcamos llenado de cero gaps.
+                        // Avanzamos el "t" por la duración entera del servicio que acabamos de ofrecer.
+                        // Esto hace que, secuencialmente, el sistema fomente que los clientes agenden espalda-con-espalda,
+                        // dejando así mayor densidad de ocupación continua para el barbero.
                         t += totalDurationWithMargin;
                     }
                 }

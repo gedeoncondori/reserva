@@ -4,10 +4,19 @@ import { supabase } from '../../../lib/supabase';
 import { Save, Loader2, Calendar, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+/**
+ * Componente Principal del Dashboard: BarberBookingConfig
+ * Funcionalidad: Permite a los administradores / barberos gestionar las reglas dinámicas
+ * de su agenda. Estos valores influirán directamente en el "Greedy Gap Packing" que corre en el lado del cliente.
+ */
 interface Props {
+    /** Identificador único del barbero logueado o seleccionado */
     barberoId: string;
+    /** Parámetros pre-cargados desde Supabase (tabla: perfiles) */
     initialConfig: {
+        /** Margen requerido antes de que un cliente pueda agendar de pronto (evita sorpresas) */
         min_anticipacion_minutos: number;
+        /** Límite de días hacia el futuro a los que el calendario está abierto */
         ventana_reserva_dias: number;
     };
 }

@@ -48,15 +48,23 @@ export const optimizeImage = async (
                 canvas.width = width;
                 canvas.height = height;
 
+                // 1. DIBUJO Y ESCALADO (Canvas API):
+                // Usamos el lienzo virtual (canvas) del navegador web, no requerimos de un servidor
+                // ni de Node.js para achicar la imagen. El navegador es súper rápido redimensionando píxeles.
                 const ctx = canvas.getContext('2d');
                 if (!ctx) {
                     reject(new Error('Failed to get canvas context'));
                     return;
                 }
 
-                // Draw and compress
+                // Aquí "dibujamos" la foto original pero comprimida contra los límites width/height
                 ctx.drawImage(img, 0, 0, width, height);
 
+                // 2. CONVERSIÓN Y CALIDAD (toBlob):
+                // Agarramos el lienzo ya dibujado al nuevo tamaño y le pedimos al explorador
+                // que lo comprima a un archivo binario final (Blob). 
+                // - format: image/webp o image/jpeg.
+                // - quality: 0.7 o 0.8 destrozan el peso final del archivo, bajando de MegaBytes a simples Kilobytes sin que el ojo humano note caídas graves.
                 canvas.toBlob(
                     (blob) => {
                         if (blob) {

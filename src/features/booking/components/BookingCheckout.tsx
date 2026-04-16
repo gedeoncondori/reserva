@@ -50,13 +50,19 @@ export const BookingCheckout = () => {
 
             const expiresAt = addMinutes(new Date(), 10).toISOString();
 
+            // EXPLICACIÓN DE RESERVA SIN REGISTRO:
+            // Para evitar la fricción de que los clientes tengan que crear un usuario e iniciar sesión,
+            // permitimos que envíen sus datos (nombre, email, celular) como parte directa del formulario de checkout (values).
+            // La base de datos guarda esta información directamente en la tabla de 'citas' en vez de vincularla a un 'user_id' de Auth.
+            // Para prevenir reservas falsas, el estado inicial es 'temporal' y tiene un tiempo de expiración (expires_at).
             const { data, error } = await (supabase.from('citas') as any).insert({
                 barbero_id: barbero.id,
                 servicio_id: servicio.id,
                 fecha: format(fecha, 'yyyy-MM-dd'),
                 hora_inicio: hora,
                 hora_fin: horaFin,
-                estado: 'temporal',
+                estado: 'temporal', // Se bloquea el turno por 10 minutos
+                // Guardamos los datos del cliente anónimo de forma cruda en vez de requerir uuid
                 cliente_nombre: values.nombre,
                 cliente_email: values.email,
                 cliente_celular: values.celular,

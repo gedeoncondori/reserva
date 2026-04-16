@@ -1,13 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Scissors, User } from 'lucide-react';
+import { Scissors } from 'lucide-react';
 import { ServiceList } from '../components/ServiceList';
 import { BarberList } from '../components/BarberList';
 import { AvailabilitySelector } from '../components/AvailabilitySelector';
 import { BookingCheckout } from '../components/BookingCheckout';
 import { useBookingStore } from '../../../store/useBookingStore';
 
+/**
+ * FUNCIONALIDAD IMPORTANTE: ORQUESTADOR PRINCIPAL DEL WIZARD DE RESERVA.
+ * Maneja el enrutamiento lógico por estados (store) en lugar de crear rutas HTML diferentes.
+ * Proceso:
+ * 1. Selección de Servicio (Extrae Duración y Precio).
+ * 2. Selección de Barbero.
+ * 3. Selector de Disponibilidad (Llama a base de datos y calcula huecos eficientes).
+ * 4. Checkout (Recolección de datos y bloqueo temporal de cupo con pago QR).
+ */
 export const BookingPage = () => {
+    // Extracción de las acciones globales del manejador Zustand
     const { step, reset } = useBookingStore();
 
     return (
@@ -24,26 +33,16 @@ export const BookingPage = () => {
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                        <div className="hidden sm:flex items-center gap-4">
-                            <div className="h-1.5 w-32 bg-slate-800 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-500"
-                                    style={{ width: `${(step / 4) * 100}%` }}
-                                />
-                            </div>
-                            <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em]">
-                                Paso {step} <span className="text-slate-700 mx-1">/</span> 4
-                            </span>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden sm:flex h-1.5 w-32 bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-500"
+                                style={{ width: `${(step / 4) * 100}%` }}
+                            />
                         </div>
-
-                        <Link
-                            to="/login"
-                            className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800 rounded-xl border border-slate-700/50 transition-all text-slate-400 hover:text-white group"
-                        >
-                            <User size={16} className="group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-black uppercase tracking-widest hidden xs:block">Panel Staff</span>
-                        </Link>
+                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em]">
+                            Paso {step} <span className="text-slate-700 mx-1">/</span> 4
+                        </span>
                     </div>
                 </div>
             </header>
