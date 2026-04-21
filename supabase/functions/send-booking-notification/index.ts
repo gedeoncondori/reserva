@@ -1,6 +1,12 @@
+// @ts-nocheck
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+// ... (el resto queda igual)
+
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
+
+
 
 // ----- DEPRECADO (RESEND API) -----
 // const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -33,6 +39,9 @@ Deno.serve(async (req: Request) => {
     // Casos manejados por el admin
     const isApprovedByAdmin = statusChanged && record.estado === 'confirmada';
     const isRejectedByAdmin = statusChanged && record.estado === 'rechazada';
+
+    // Caso de recordatorio automático (pg_cron)
+    const isReminder = type === 'REMINDER';
 
     const emailsToSend: any[] = [];
 
@@ -77,6 +86,19 @@ Deno.serve(async (req: Request) => {
               <h1>Hola ${record.cliente_nombre},</h1>
               <p>Lo sentimos, no hemos podido validar tu reserva. Esto puede deberse a un error en el comprobante subido o en los montos.</p>
               <p>Por favor, contacta con nosotros vía WhatsApp directamente para resolverlo de inmediato.</p>
+            `
+        });
+    } else if (isReminder) {
+        emailsToSend.push({
+            to: record.cliente_email,
+            subject: "⏰ Recordatorio: ¡Tu cita es en Media Hora!",
+            html: `
+              <h1>¡Hola ${record.cliente_nombre}!</h1>
+              <p>Te recordamos que tienes una cita programada con nosotros en aproximadamente 30 minutos.</p>
+              <p><b>Por favor, sé puntual para no perder tu turno y garantizar la mejor atención.</b></p>
+              <hr />
+              <p><b>Detalles:</b><br/>Fecha: ${record.fecha}<br/>Hora: ${record.hora_inicio}</p>
+              <p>¡Nos vemos pronto en Imperio Barber Studio!</p>
             `
         });
     }
