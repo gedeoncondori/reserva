@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Database } from '../types/supabase';
 
 type Servicio = Database['public']['Tables']['servicios']['Row'];
@@ -38,19 +39,33 @@ interface BookingState {
     reset: () => void;
 }
 
-export const useBookingStore = create<BookingState>((set) => ({
-    step: 1,
-    servicio: null,
-    barbero: null,
-    fecha: null,
-    hora: null,
-    appointmentId: null,
-    setServicio: (servicio) => set({ servicio, step: 2 }),
-    setBarbero: (barbero) => set({ barbero, step: 3 }),
-    setFecha: (fecha) => set({ fecha }),
-    setHora: (hora) => set({ hora }),
-    setAppointmentId: (id) => set({ appointmentId: id }),
-    nextStep: () => set((state) => ({ step: state.step + 1 })),
-    prevStep: () => set((state) => ({ step: state.step - 1 })),
-    reset: () => set({ step: 1, servicio: null, barbero: null, fecha: null, hora: null, appointmentId: null }),
-}));
+export const useBookingStore = create<BookingState>()(
+    persist(
+        (set) => ({
+            step: 1,
+            servicio: null,
+            barbero: null,
+            fecha: null,
+            hora: null,
+            appointmentId: null,
+            setServicio: (servicio) => set({ servicio, step: 2 }),
+            setBarbero: (barbero) => set({ barbero, step: 3 }),
+            setFecha: (fecha) => set({ fecha }),
+            setHora: (hora) => set({ hora }),
+            setAppointmentId: (id) => set({ appointmentId: id }),
+            nextStep: () => set((state) => ({ step: state.step + 1 })),
+            prevStep: () => set((state) => ({ step: Math.max(1, state.step - 1) })),
+            reset: () => set({ step: 1, servicio: null, barbero: null, fecha: null, hora: null, appointmentId: null }),
+        }),
+        {
+            name: 'barberflow-booking-storage',
+            // Interceptar la deserialización para convertir 'fecha' (string JSON) de vuelta a objeto Date nativo.
+            merge: (persistedState: any, currentState) => {
+                if (persistedState?.fecha) {
+                    persistedState.fecha = new Date(persistedState.fecha);
+                }
+                return { ...currentState, ...persistedState };
+            }
+        }
+    )
+);
